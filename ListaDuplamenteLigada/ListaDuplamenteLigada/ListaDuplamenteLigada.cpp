@@ -20,6 +20,7 @@ void exibirReverso();
 void inserirElemento();
 void excluirPrimeiroElemento();
 void excluirUltimoElemento();
+void excluirElementoEspecifico();
 
 //--------------------------
 
@@ -32,7 +33,7 @@ int main()
 void menu()
 {
 	int op = 0;
-	while (op != 8) {
+	while (op != 9) {
 		system("cls"); // somente no windows
 		cout << "Menu Lista Ligada";
 		cout << endl << endl;
@@ -43,7 +44,8 @@ void menu()
 		cout << "5 - Exibir elementos na ordem reversa \n";
 		cout << "6 - Excluir primeiro elemento \n";
 		cout << "7 - Excluir ultimo elemento \n";
-		cout << "8 - Sair \n\n";
+		cout << "8 - Excluir elemento especifico \n";
+		cout << "9 - Sair \n\n";
 
 		cout << "Opcao: ";
 		cin >> op;
@@ -54,7 +56,7 @@ void menu()
 			break;
 		case 2:inserirElemento();
 			break;
-		case 3: exibirQuantidadeElementos(); 
+		case 3: exibirQuantidadeElementos();
 			break;
 		case 4: exibirElementos();
 			break;
@@ -64,7 +66,9 @@ void menu()
 			break;
 		case 7: excluirUltimoElemento();
 			break;
-		case 8:
+		case 8: excluirElementoEspecifico();
+			break;
+		case 9:
 			return;
 		default:
 			break;
@@ -138,11 +142,31 @@ void inserirElemento()
 		primeiro = novo;
 		ultimo = novo;
 	}
-	else
-	{
-		novo->ant = ultimo;
-		ultimo->prox = novo;
-		ultimo = novo;
+	else {
+		NO* aux = primeiro;
+		NO* anterior = NULL;
+
+		while (aux != NULL && aux->valor < novo->valor) {
+			anterior = aux;
+			aux = aux->prox;
+		}
+
+		if (anterior == NULL) {
+			novo->prox = primeiro;
+			primeiro->ant = novo;
+			primeiro = novo;
+		}
+		else if (aux == NULL) {
+			novo->ant = ultimo;
+			ultimo->prox = novo;
+			ultimo = novo;
+		}
+		else {
+			novo->prox = aux;
+			novo->ant = anterior;
+			anterior->prox = novo;
+			aux->ant = novo;
+		}
 	}
 }
 
@@ -151,11 +175,11 @@ void inserirElemento()
 void exibirReverso()
 {
 	if (primeiro == NULL) {
-		cout << "Nao ha elementos na lista" << endl;
+		cout << "Lista vazia \n";
 		return;
 	}
 	else {
-		cout << "Elementos:" << endl;
+		cout << "Elementos: \n";
 		NO* aux = ultimo;
 		while (aux != NULL) {
 			cout << aux->valor << endl;
@@ -168,50 +192,81 @@ void excluirPrimeiroElemento()
 {
 	NO* aux = primeiro;
 	if (aux == NULL) {
-		cout << "Nao ha elementos na lista" << endl;
+		cout << "Lista vazia \n";
 		return;
 	}
-	else if (aux->ant == NULL && aux->prox == NULL) {
+
+	if (aux->ant == NULL && aux->prox == NULL) {
 		primeiro = NULL;
 		ultimo = NULL;
 		free(aux);
 		cout << "Elemento excluido. \n";
 		return;
 	}
-	else {
-		primeiro = aux->prox;
-		primeiro->ant = NULL;
-		free(aux);
-		cout << "Elemento excluido. \n";
-		return;
-	}
+
+	primeiro = aux->prox;
+	primeiro->ant = NULL;
+	free(aux);
+	cout << "Elemento excluido. \n";
 }
 
 void excluirUltimoElemento()
 {
 	NO* aux = ultimo;
 	if (primeiro == NULL) {
-		cout << "Nao ha elementos na lista" << endl;
+		cout << "Lista vazia \n";
 		return;
 	}
-	else if (aux->ant == NULL && aux->prox == NULL) {
+
+	if (aux->ant == NULL && aux->prox == NULL) {
 		primeiro = NULL;
 		ultimo = NULL;
 		free(aux);
 		cout << "Elemento excluido. \n";
 		return;
 	}
-	else {
-		ultimo = aux->ant;
-		ultimo->prox = NULL;
-		free(aux);
-		cout << "Elemento excluido. \n";
-		return;
-	}
+
+	ultimo = aux->ant;
+	ultimo->prox = NULL;
+	free(aux);
+	cout << "Elemento excluido. \n";
 }
 
+void excluirElementoEspecifico() {
 
+	if (primeiro == NULL) {
+		cout << "Lista vazia \n";
+		return;
+	}
 
+	int elementoExcluir;
+	cout << "Digite o elemento a ser excluido: ";
+	cin >> elementoExcluir;
 
+	NO* aux = primeiro;
+	while (aux != NULL) {
+		if (aux->valor == elementoExcluir) {
+			if (aux->ant != NULL) {
+				aux->ant->prox = aux->prox;
+			}
+			else {
+				primeiro = aux->prox;
+			}
 
+			if (aux->prox != NULL) {
+				aux->prox->ant = aux->ant;
+			}
+			else {
+				ultimo = aux->ant;
+			}
 
+			free(aux);
+			cout << "Elemento excluido \n";
+			return;
+		}
+
+		aux = aux->prox;
+	}
+
+	cout << "Elemento nao encontrado \n";
+}
